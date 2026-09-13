@@ -1,12 +1,13 @@
 /**
-  * @file    ui.h
-  * @author  JM
-  * @brief   App layer functions for UI management
-  * @date    2026
-  */
+ * @file    ui.h
+ * @author  Jose
+ * @brief   Mini UI framework for SH1106 screen using STM32
+ * @date    20/7/26
+ * @project tfg
+ */
 
-#ifndef __UI_H__
-#define __UI_H__
+#ifndef UI_H
+#define UI_H
 
 #include "cmsis_os.h"
 #include "FreeRTOS.h"
@@ -17,6 +18,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "sh1106.h"
+#include "font_10x16.h"
+#include "font_5x8.h"
+#include "icons.h"
+
+extern const SH1106_Font_t Font_10x16;
+extern const SH1106_Font_t Font_5x8;
 
 typedef struct {
   uint8_t x;
@@ -43,15 +50,11 @@ typedef enum {
   ICON_7x7_NET_DISCONNECTED,
 } UI_IconIndex_t;
 
-void UI_Create_Task(void);
-
 void UI_Container_Split_H(const UI_Container_t *parent, UI_Container_t *left, UI_Container_t *right, uint8_t split_pct);
 void UI_Container_Split_V(const UI_Container_t *parent, UI_Container_t *top, UI_Container_t *bottom, uint8_t split_pct);
-
 void UI_Container_Draw_Text(const UI_Container_t *c, uint8_t rel_x, uint8_t rel_y, SH1106_Pixel_State_t state, const SH1106_Font_t *font, const char *format, ...);
 void UI_Container_Draw_Button(const UI_Container_t *c, uint8_t rel_x, uint8_t rel_y, uint8_t width, uint8_t height, const char* label, bool is_focused);
 void UI_Container_Draw_Icon(const UI_Container_t *c, uint8_t rel_x, uint8_t rel_y, UI_IconIndex_t icon, SH1106_Pixel_State_t state);
-
 void UI_Draw_Status_Bar(const UI_Container_t *c, const char *title, uint8_t battery_level, bool connected);
 
-#endif // __UI_H__
+#endif // UI_H

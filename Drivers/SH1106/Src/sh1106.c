@@ -1,5 +1,15 @@
+/**
+ * @file    sh1106.c
+ * @author  Jose
+ * @brief   Driver library for SH1106 OLED display (128x64) using I2C for STM32F1.
+ * @date    13/9/26
+ * @project tfg
+ */
+
 #include "sh1106.h"
-#include "stm32f4xx_hal_i2c.h"
+
+#include <stdlib.h>
+#include <string.h>
 
 /**
  * @brief The size of the display is 128x64 px. The display data 

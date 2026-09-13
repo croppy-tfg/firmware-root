@@ -1,67 +1,28 @@
+/**
+ * @file    ui.c
+ * @author  Jose
+ * @brief   Mini UI framework for SH1106 screen using STM32
+ * @date    20/7/26
+ * @project tfg
+ */
+
 #include "ui.h"
 #include "sh1106.h"
-#include "font_10x16.h"
-#include "font_5x8.h"
-#include "icons.h"
 #include <stdint.h>
 
-static TaskHandle_t uiTaskHandle;
-
 const SH1106_Font_t Font_10x16 = {
-  .height = 16,
-  .width = 10,
-  .map = __10x16,
-  .size = SH1106_FONT_10x16
-};
+    .height = 16,
+    .width = 10,
+    .map = Map_10x16,
+    .size = SH1106_FONT_10x16
+  };
 
 const SH1106_Font_t Font_5x8 = {
-  .height = 8,
-  .width = 5,
-  .map = __5x8,
-  .size = SH1106_FONT_5x8
-};
-
-void UI_Handler(void *pArgs)
-{
-    uint32_t tick = osKernelSysTick();
-
-    UI_Container_t root_screen = {0, 0, 128, 64, 2};
-    UI_Container_t status_bar_view, main_view;
-
-    for(;;) {
-        SH1106_Clear();
-
-        UI_Container_Split_V(&root_screen, &status_bar_view, &main_view, 18);
-        
-        UI_Draw_Status_Bar(&status_bar_view, "Croppy v1.0", 75, true);
-
-        UI_Container_Draw_Icon(&main_view, 0, 2, ICON_15x15_HUMIDITY, SH1106_PIXEL_ON);
-        UI_Container_Draw_Text(&main_view, 17, 2, SH1106_PIXEL_ON, &Font_10x16, "Hum: %d%%", 100);
-        
-        UI_Container_Draw_Icon(&main_view, 0, 18, ICON_15x15_PH, SH1106_PIXEL_ON);
-        UI_Container_Draw_Text(&main_view, 17, 18, SH1106_PIXEL_ON, &Font_10x16, "pH:  %d", 14);
-        
-        UI_Container_Draw_Icon(&main_view, 0, 34, ICON_15x15_NPK, SH1106_PIXEL_ON);
-        UI_Container_Draw_Text(&main_view, 17, 34, SH1106_PIXEL_ON, &Font_10x16, "NPK: %d%%", 100);
-
-        SH1106_Update_Screen();
-
-        tick += 66; // 15 FPS
-        osDelayUntil(tick);
-    }
-}
-
-void UI_Create_Task(void) 
-{
-    xTaskCreate(
-        UI_Handler,
-        "UI Task",
-        512,
-        NULL,
-        2,
-        &uiTaskHandle
-    );
-}
+    .height = 8,
+    .width = 5,
+    .map = Map_5x8,
+    .size = SH1106_FONT_5x8
+  };
 
 void UI_Container_Split_H(const UI_Container_t *parent, UI_Container_t *left, UI_Container_t *right, uint8_t split_pct) 
 {

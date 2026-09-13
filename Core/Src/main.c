@@ -23,6 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sh1106.h"
+#include "tasks.h"
+#include "tsl2591.h"
 #include "ui.h"
 /* USER CODE END Includes */
 
@@ -102,6 +104,13 @@ int main(void)
     .com_pins_config        = SH1106_COM_ALTERNATIVE, // POR
     .mirror                 = SH1106_MIRROR_BOTH // POR
   };
+
+  const TSL2591_Config_t lux_config = {
+    .hi2c                   = &hi2c2,
+    .i2c_addr               = TSL2591_ADDRESS,
+    .gain                   = TSL2591_GAIN_MED,
+    .integration_time       = TSL2591_INTEGRATIONTIME_200MS
+  };
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -117,6 +126,7 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   SH1106_Init(&display_config);
+  TSL2591_Init(&lux_config);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -143,7 +153,7 @@ int main(void)
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  UI_Create_Task();
+  Tasks_Init();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
