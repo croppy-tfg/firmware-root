@@ -55,6 +55,8 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+static SH1106_Handle_t display_handle;
+static TSL2591_Handle_t tsl_handle;
 
 /* USER CODE END PV */
 
@@ -125,8 +127,8 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-  SH1106_Init(&display_config);
-  TSL2591_Init(&lux_config);
+  SH1106_Init(&display_handle, &display_config);
+  TSL2591_Init(&tsl_handle, &lux_config);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -153,7 +155,7 @@ int main(void)
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  Tasks_Init();
+  Tasks_Init(&tsl_handle, &display_handle);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

@@ -21,8 +21,9 @@ QueueHandle_t xSensorQueue = NULL;
 TaskHandle_t uiTaskHandle;
 TaskHandle_t tsl2591TaskHandle;
 
-bool Tasks_Init(void)
+bool Tasks_Init(TSL2591_Handle_t *tsl_h, SH1106_Handle_t *disp_h)
 {
+    if (tsl_h == NULL || disp_h == NULL) return false;
     xSensorQueue = xQueueCreate(SENSOR_QUEUE_LENGTH, SENSOR_QUEUE_ITEM_SIZE);
     if (xSensorQueue == NULL) return false;
 
@@ -32,7 +33,7 @@ bool Tasks_Init(void)
         TSL2591_Measure_Task,
         "TSL2591 Task",
         256,
-        NULL,
+        tsl_h,
         2,
         &tsl2591TaskHandle
     );
@@ -42,7 +43,7 @@ bool Tasks_Init(void)
         UI_Task,
         "UI Task",
         512,
-        NULL,
+        disp_h,
         1,
         &uiTaskHandle
     );
@@ -53,7 +54,8 @@ bool Tasks_Init(void)
 
 void TSL2591_Measure_Task(void *pvParameters)
 {
-    (void)pvParameters;
+    TSL2591_Handle_t *tsl_h = (TSL2591_Handle_t *)pvParameters;
+    if (tsl_h == NULL) vTaskDelete(NULL);
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xPeriod = pdMS_TO_TICKS(1000);
 
@@ -64,11 +66,11 @@ void TSL2591_Measure_Task(void *pvParameters)
     for (;;) {
         vTaskDelayUntil(&xLastWakeTime, xPeriod);
 
-        if (TSL2591_Read_Raw_Data(&ch0, &ch1) == HAL_OK) {
+        if (TSL2591_Read_Raw_Data(tsl_h, &ch0, &ch1) == HAL_OK) {
             msg.timestamp_ms = xTaskGetTickCount() * portTICK_PERIOD_MS;
             msg.data.tsl2591.ch0_raw = ch0;
             msg.data.tsl2591.ch1_raw = ch1;
-            msg.data.tsl2591.lux = TSL2591_Calculate_Lux(ch0, ch1);
+            msg.data.tsl2591.lux = TSL2591_Calculate_Lux(tsl_h, ch0, ch1);
 
             xQueueSend(xSensorQueue, &msg, 0);
         }
@@ -84,7 +86,8 @@ void SHT40_Measure_Task(void *pvParameters)
 
 void UI_Task(void *pvParameters)
 {
-    (void)pvParameters;
+    SH1106_Handle_t *disp_h = (SH1106_Handle_t *)pvParameters;
+    if (disp_h == NULL) vTaskDelete(NULL);
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xFramePeriod = pdMS_TO_TICKS(66);
@@ -118,28 +121,28 @@ void UI_Task(void *pvParameters)
             }
         }
 
-        SH1106_Clear();
+        SH1106_Clear(disp_h);
 
         UI_Container_Split_V(&root_screen, &status_bar_view, &main_view, 18);
-        UI_Draw_Status_Bar(&status_bar_view, "Croppy v1.0", battery_pct, lora_connected);
+        UI_Draw_Status_Bar(disp_h, &status_bar_view, "Croppy v1.0", battery_pct, lora_connected);
 
         FloatSplit_t hum_split = Utils_Split_Float(last_hum, 1);
-        UI_Container_Draw_Icon(&main_view, 0, 2, ICON_15x15_HUMIDITY, SH1106_PIXEL_ON);
-        UI_Container_Draw_Text(&main_view, 17, 2, SH1106_PIXEL_ON, &Font_10x16,
+        UI_Container_Draw_Icon(disp_h, &main_view, 0, 2, ICON_15x15_HUMIDITY, SH1106_PIXEL_ON);
+        UI_Container_Draw_Text(disp_h, &main_view, 17, 2, SH1106_PIXEL_ON, &Font_10x16,
                       "Hum:  %d.%u%%", hum_split.integer_part, hum_split.decimal_part);
 
         FloatSplit_t temp_split = Utils_Split_Float(last_temp, 1);
-        UI_Container_Draw_Icon(&main_view, 0, 18, ICON_15x15_TEMPERATURE, SH1106_PIXEL_ON);
-        UI_Container_Draw_Text(&main_view, 17, 18, SH1106_PIXEL_ON, &Font_10x16,
+        UI_Container_Draw_Icon(disp_h, &main_view, 0, 18, ICON_15x15_TEMPERATURE, SH1106_PIXEL_ON);
+        UI_Container_Draw_Text(disp_h, &main_view, 17, 18, SH1106_PIXEL_ON, &Font_10x16,
                       "Temp: %s%d.%uC", temp_split.is_negative ? "-" : "",
                       temp_split.integer_part, temp_split.decimal_part);
 
         FloatSplit_t lux_split = Utils_Split_Float(last_lux, 0);
-        UI_Container_Draw_Icon(&main_view, 0, 34, ICON_15x15_PH, SH1106_PIXEL_ON); // TODO make lux icon
-        UI_Container_Draw_Text(&main_view, 17, 34, SH1106_PIXEL_ON, &Font_10x16,
+        UI_Container_Draw_Icon(disp_h, &main_view, 0, 34, ICON_15x15_PH, SH1106_PIXEL_ON); // TODO make lux icon
+        UI_Container_Draw_Text(disp_h, &main_view, 17, 34, SH1106_PIXEL_ON, &Font_10x16,
                       "Lux:  %u", lux_split.integer_part);
 
-        SH1106_Update_Screen();
+        (void)SH1106_Update_Screen(disp_h);
 
         vTaskDelayUntil(&xLastWakeTime, xFramePeriod);
     }

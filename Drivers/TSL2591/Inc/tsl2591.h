@@ -78,24 +78,31 @@ typedef struct {
     TSL2591_IntegrationTime_t   integration_time;
 } TSL2591_Config_t;
 
+typedef struct {
+    I2C_HandleTypeDef          *hi2c;
+    uint16_t                    addr;
+    TSL2591_Gain_t              gain;
+    TSL2591_IntegrationTime_t   integration_time;
+} TSL2591_Handle_t;
+
 /**
  * @brief Initializes the TSL2591 sensor and verifies its device ID.
  * @param config Pointer to configuration struct.
  * @retval HAL_OK on success, HAL_ERROR or timeout otherwise.
  */
-HAL_StatusTypeDef TSL2591_Init(const TSL2591_Config_t *config);
+HAL_StatusTypeDef TSL2591_Init(TSL2591_Handle_t *h, const TSL2591_Config_t *config);
 
 /**
  * @brief Powers ON internal oscillator and enables ALS engine.
  * @retval HAL_StatusTypeDef
  */
-HAL_StatusTypeDef TSL2591_Enable(void);
+HAL_StatusTypeDef TSL2591_Enable(TSL2591_Handle_t *h);
 
 /**
  * @brief Powers OFF internal oscillator and ALS engine to conserve energy.
  * @retval HAL_StatusTypeDef
  */
-HAL_StatusTypeDef TSL2591_Disable(void);
+HAL_StatusTypeDef TSL2591_Disable(TSL2591_Handle_t *h);
 
 /**
  * @brief Configures sensor gain and integration time.
@@ -103,13 +110,13 @@ HAL_StatusTypeDef TSL2591_Disable(void);
  * @param it Integration time.
  * @retval HAL_StatusTypeDef
  */
-HAL_StatusTypeDef TSL2591_Set_Timing_Gain(TSL2591_Gain_t gain, TSL2591_IntegrationTime_t it);
+HAL_StatusTypeDef TSL2591_Set_Timing_Gain(TSL2591_Handle_t *h, TSL2591_Gain_t gain, TSL2591_IntegrationTime_t it);
 
 /**
  * @brief Checks if a measurement conversion has finished.
  * @retval true if data is ready, false otherwise.
  */
-bool TSL2591_Is_Data_Ready(void);
+bool TSL2591_Is_Data_Ready(TSL2591_Handle_t *h);
 
 /**
  * @brief Reads the raw ADC data of both photodiode channels simultaneously.
@@ -117,7 +124,7 @@ bool TSL2591_Is_Data_Ready(void);
  * @param ch1 Pointer to store Channel 1 (IR) raw data.
  * @retval HAL_StatusTypeDef
  */
-HAL_StatusTypeDef TSL2591_Read_Raw_Data(uint16_t *ch0, uint16_t *ch1);
+HAL_StatusTypeDef TSL2591_Read_Raw_Data(TSL2591_Handle_t *h, uint16_t *ch0, uint16_t *ch1);
 
 /**
  * @brief Calculates ambient light level in Lux based on raw ADC values.
@@ -125,6 +132,6 @@ HAL_StatusTypeDef TSL2591_Read_Raw_Data(uint16_t *ch0, uint16_t *ch1);
  * @param ch1 Raw ADC count for Channel 1.
  * @retval Calculated illuminance in Lux (float).
  */
-float TSL2591_Calculate_Lux(uint16_t ch0, uint16_t ch1);
+float TSL2591_Calculate_Lux(TSL2591_Handle_t *h, uint16_t ch0, uint16_t ch1);
 
 #endif // TSL2591_H

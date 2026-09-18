@@ -14,6 +14,7 @@
 #define SH1106_WIDTH                128
 #define SH1106_HEIGHT               64
 #define SH1106_BUFFER_SIZE          (SH1106_WIDTH * SH1106_HEIGHT / 8)
+#define SH1106_I2C_TIMEOUT          100
 
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
@@ -67,13 +68,19 @@ typedef struct {
     SH1106_MirrorMode_t  mirror;                // H/V mirror
 } SH1106_Config_t;
 
+typedef struct {
+    I2C_HandleTypeDef *hi2c;
+    uint16_t i2c_addr;
+    uint8_t buffer[SH1106_BUFFER_SIZE];
+} SH1106_Handle_t;
+
 /**
   * @brief Initializes the display sending the appropiate I2C commands
   *
   * @param None
   * @retval None
   */
-void SH1106_Init(const SH1106_Config_t *config);
+HAL_StatusTypeDef SH1106_Init(SH1106_Handle_t *h, const SH1106_Config_t *config);
 
 /**
   * @brief Writes the content of the frame buffer into de GDDRAM
@@ -81,7 +88,7 @@ void SH1106_Init(const SH1106_Config_t *config);
   * @param None
   * @retval None
   */
-void SH1106_Update_Screen(void);
+HAL_StatusTypeDef SH1106_Update_Screen(SH1106_Handle_t *h);
 
 /**
   * @brief Clears the display
@@ -89,7 +96,7 @@ void SH1106_Update_Screen(void);
   * @param None
   * @retval None
   */
-void SH1106_Clear(void);
+void SH1106_Clear(SH1106_Handle_t *h);
 
 /**
  * @brief Writes a formatted string from a font map into the display at the given coordinates.
@@ -99,7 +106,7 @@ void SH1106_Clear(void);
  * @param format: the formatted text to write
  * @retval None
  */
-void SH1106_Draw_Text(uint8_t x, uint8_t y, SH1106_Pixel_State_t state, const SH1106_Font_t *font, const char *text);
+void SH1106_Draw_Text(SH1106_Handle_t *h, uint8_t x, uint8_t y, SH1106_Pixel_State_t state, const SH1106_Font_t *font, const char *text);
 
 /**
   * @brief Turns on/off the selected pixel.
@@ -117,7 +124,7 @@ void SH1106_Draw_Text(uint8_t x, uint8_t y, SH1106_Pixel_State_t state, const SH
   * @param state: SH1106_PIXEL_ON (0x01) or SH1106_PIXEL_OFF (0x00)
   * @retval None
   */
-void SH1106_Draw_Pixel(uint8_t x, uint8_t y, SH1106_Pixel_State_t state);
+void SH1106_Draw_Pixel(SH1106_Handle_t *h, uint8_t x, uint8_t y, SH1106_Pixel_State_t state);
 
 /**
   * @brief Draws a monochrome bitmap on the screen
@@ -129,7 +136,7 @@ void SH1106_Draw_Pixel(uint8_t x, uint8_t y, SH1106_Pixel_State_t state);
   * @param height: image height in pixels
   * @retval None
   */
-void SH1106_Draw_Bitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, SH1106_Pixel_State_t state);
+void SH1106_Draw_Bitmap(SH1106_Handle_t *h, uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, SH1106_Pixel_State_t state);
 
 /**
  * @brief Draws a line wether it is X/Y only or it has
@@ -140,7 +147,7 @@ void SH1106_Draw_Bitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t wid
  * @param y2: Y2
  * @param state: SH1106_PIXEL_ON/SH1106_PIXEL_OFF
  */
-void SH1106_Draw_Line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SH1106_Pixel_State_t state);
+void SH1106_Draw_Line(SH1106_Handle_t *h, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SH1106_Pixel_State_t state);
 
 /**
  * @brief Draws a rectangle of a given dimensions from (x, y)
@@ -151,6 +158,6 @@ void SH1106_Draw_Line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SH1106_Pix
  * @param height: Y + width
  * @param state: SH1106_PIXEL_ON/SH1106_PIXEL_OFF
  */
-void SH1106_Draw_Rectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height, SH1106_Pixel_State_t state);
+void SH1106_Draw_Rectangle(SH1106_Handle_t *h, uint8_t x, uint8_t y, uint8_t width, uint8_t height, SH1106_Pixel_State_t state);
 
 #endif // SH1106_H
