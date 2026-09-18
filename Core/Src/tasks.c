@@ -138,7 +138,7 @@ void UI_Task(void *pvParameters)
                       temp_split.integer_part, temp_split.decimal_part);
 
         FloatSplit_t lux_split = Utils_Split_Float(last_lux, 0);
-        UI_Container_Draw_Icon(disp_h, &main_view, 0, 34, ICON_15x15_PH, SH1106_PIXEL_ON); // TODO make lux icon
+        UI_Container_Draw_Icon(disp_h, &main_view, 0, 34, ICON_15x15_LUX, SH1106_PIXEL_ON);
         UI_Container_Draw_Text(disp_h, &main_view, 17, 34, SH1106_PIXEL_ON, &Font_10x16,
                       "Lux:  %u", lux_split.integer_part);
 

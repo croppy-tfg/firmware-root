@@ -36,9 +36,9 @@ typedef struct {
 typedef enum {
   // 15x15
   ICON_15x15_HUMIDITY = 0,
-  ICON_15x15_NPK,
-  ICON_15x15_PH,
   ICON_15x15_TEMPERATURE,
+  ICON_15x15_LUX,
+  ICON_15x15_NPK,
 
   // 7x7
   ICON_7x7_BATTERY_EMPTY = 100, 
