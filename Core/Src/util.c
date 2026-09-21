@@ -2,7 +2,7 @@
  * @file    util.c
  * @author  Jose
  * @date    17/9/26
- * @project tfg
+ * @project firmware-root
  */
 
 #include "util.h"

@@ -3,7 +3,7 @@
  * @author  Jose
  * @brief   10x16 pixels font
  * @date    17/7/26
- * @project tfg
+ * @project firmware-root
  */
 
 #ifndef FONT_10x16_H

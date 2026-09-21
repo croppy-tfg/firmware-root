@@ -3,7 +3,7 @@
  * @author  Jose
  * @brief   Mini UI framework for SH1106 screen using STM32
  * @date    20/7/26
- * @project tfg
+ * @project firmware-root
  */
 
 #ifndef UI_H

@@ -2,7 +2,7 @@
  * @file    util.h
  * @author  Jose
  * @date    17/9/26
- * @project tfg
+ * @project firmware-root
  */
 
 #ifndef UTIL_H

@@ -3,7 +3,7 @@
  * @author  Jose
  * @brief   Icons encoded in byte arrays
  * @date    26/6/26
- * @project tfg
+ * @project firmware-root
  */
 
 #ifndef ICONS_H

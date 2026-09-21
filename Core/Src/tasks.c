@@ -3,7 +3,7 @@
  * @author  Jose
  * @brief   FreeRTOS tasks creation
  * @date    15/9/26
- * @project tfg
+ * @project firmware-root
  */
 
 #include "tasks.h"
