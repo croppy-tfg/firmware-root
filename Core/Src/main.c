@@ -57,6 +57,7 @@ const osThreadAttr_t defaultTask_attributes = {
 /* USER CODE BEGIN PV */
 static SH1106_Handle_t display_handle;
 static TSL2591_Handle_t tsl_handle;
+static SHT40_Handle_t sht_handle;
 
 /* USER CODE END PV */
 
@@ -129,6 +130,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SH1106_Init(&display_handle, &display_config);
   TSL2591_Init(&tsl_handle, &lux_config);
+  SHT40_Init(&sht_handle, &hi2c2, SHT40_ADDRESS);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -155,7 +157,7 @@ int main(void)
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  Tasks_Init(&tsl_handle, &display_handle);
+  Tasks_Init(&tsl_handle, &sht_handle, &display_handle);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

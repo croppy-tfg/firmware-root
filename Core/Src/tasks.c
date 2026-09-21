@@ -10,6 +10,7 @@
 #include "task.h"
 #include "tsl2591.h"
 #include "sh1106.h"
+#include "sht40.h"
 #include "ui.h"
 #include "util.h"
 
@@ -20,8 +21,9 @@
 QueueHandle_t xSensorQueue = NULL;
 TaskHandle_t uiTaskHandle;
 TaskHandle_t tsl2591TaskHandle;
+TaskHandle_t sht40TaskHandle;
 
-bool Tasks_Init(TSL2591_Handle_t *tsl_h, SH1106_Handle_t *disp_h)
+bool Tasks_Init(TSL2591_Handle_t *tsl_h, SHT40_Handle_t *sht_h, SH1106_Handle_t *disp_h)
 {
     if (tsl_h == NULL || disp_h == NULL) return false;
     xSensorQueue = xQueueCreate(SENSOR_QUEUE_LENGTH, SENSOR_QUEUE_ITEM_SIZE);
@@ -36,6 +38,16 @@ bool Tasks_Init(TSL2591_Handle_t *tsl_h, SH1106_Handle_t *disp_h)
         tsl_h,
         2,
         &tsl2591TaskHandle
+    );
+    if (ret != pdPASS) return false;
+
+    ret = xTaskCreate(
+        SHT40_Measure_Task,
+        "SHT40 Task",
+        256,
+        sht_h,
+        2,
+        &sht40TaskHandle
     );
     if (ret != pdPASS) return false;
 
@@ -79,8 +91,27 @@ void TSL2591_Measure_Task(void *pvParameters)
 
 void SHT40_Measure_Task(void *pvParameters)
 {
+    SHT40_Handle_t *sht40_h = (SHT40_Handle_t *)pvParameters;
+    if (sht40_h == NULL) vTaskDelete(NULL);
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xPeriod = pdMS_TO_TICKS(1000);
+
+    float temp = 0.0f;
+    float hum = 0.0f;
+    SensorDataMsg_t msg;
+    msg.type = SENSOR_TYPE_SHT40;
+
     for (;;) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelayUntil(&xLastWakeTime, xPeriod);
+
+        if (SHT40_Read(sht40_h, &temp, &hum) == SHT40_OK) {
+            msg.timestamp_ms = xTaskGetTickCount() * portTICK_PERIOD_MS;
+            msg.data.sht40.temperature = temp;
+            msg.data.sht40.humidity = hum;
+
+            xQueueSend(xSensorQueue, &msg, 0);
+        }
     }
 }
 
@@ -93,8 +124,8 @@ void UI_Task(void *pvParameters)
     const TickType_t xFramePeriod = pdMS_TO_TICKS(66);
 
     /* Cached latest data */
-    float last_temp = 0.0f;     // TODO real temperature
-    float last_hum = 0.0f;      // TODO real humidity
+    float last_temp = 0.0f;
+    float last_hum = 0.0f;
     float last_lux = 0.0f;
     uint8_t battery_pct = 85;   // TODO real battery level
     bool lora_connected = true; // TODO real connection status

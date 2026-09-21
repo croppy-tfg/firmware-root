@@ -1,5 +1,5 @@
 /**
-* @file    tasks.c
+ * @file    tasks.c
  * @author  Jose
  * @brief   FreeRTOS tasks creation
  * @date    15/9/26
@@ -15,6 +15,7 @@
 #include "queue.h"
 #include "tsl2591.h"
 #include "sh1106.h"
+#include "sht40.h"
 
 typedef enum {
  SENSOR_TYPE_TSL2591 = 0,
@@ -43,6 +44,6 @@ void TSL2591_Measure_Task(void *pvParameters);
 void SHT40_Measure_Task(void *pvParameters);
 void UI_Task(void *pvParameters);
 
-bool Tasks_Init(TSL2591_Handle_t *tsl_h, SH1106_Handle_t *disp_h);
+bool Tasks_Init(TSL2591_Handle_t *tsl_h, SHT40_Handle_t *sht_h, SH1106_Handle_t *disp_h);
 
 #endif //TASKS_H

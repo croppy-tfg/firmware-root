@@ -1,5 +1,5 @@
 /**
- * @file    icons.h
+ * @file    font_10x16.h
  * @author  Jose
  * @brief   10x16 pixels font
  * @date    17/7/26
