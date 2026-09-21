@@ -27,11 +27,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 add_subdirectory(cmake/stm32cubemx)
 add_subdirectory(Drivers/SH1106)
 add_subdirectory(Drivers/TSL2591)
-#add_subdirectory(Drivers/SHT40)
+add_subdirectory(Drivers/SHT40)
 
 target_link_libraries(${PROJECT_NAME}
         stm32cubemx
         sh1106
         tsl2591
-        #sht40
+        sht40
 )
