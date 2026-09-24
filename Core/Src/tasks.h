@@ -11,11 +11,18 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
 #include "FreeRTOS.h"
+#include "event_groups.h"
 #include "queue.h"
 #include "tsl2591.h"
 #include "sh1106.h"
 #include "sht40.h"
+
+#define FLAG_TSL_DONE   (1 << 0)
+#define FLAG_SHT_DONE   (1 << 1)
+#define FLAG_UI_DONE    (1 << 2)
+#define ALL_SYNC_FLAGS  (FLAG_TSL_DONE | FLAG_SHT_DONE | FLAG_UI_DONE)
 
 typedef enum {
  SENSOR_TYPE_TSL2591 = 0,
@@ -39,6 +46,10 @@ typedef struct {
 } SensorDataMsg_t;
 
 extern QueueHandle_t xSensorQueue;
+extern EventGroupHandle_t xSyncEventGroup;
+extern TaskHandle_t ui_task_handle;
+extern TaskHandle_t tsl2591_task_handle;
+extern TaskHandle_t sht40_task_handle;
 
 void TSL2591_Measure_Task(void *pvParameters);
 void SHT40_Measure_Task(void *pvParameters);

@@ -22,6 +22,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         Core/Src/ui.c
         Core/Src/tasks.c
         Core/Src/util.c
+        Core/Src/power.c
 )
 
 add_subdirectory(cmake/stm32cubemx)

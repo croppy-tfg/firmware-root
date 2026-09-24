@@ -23,6 +23,6 @@ typedef struct {
  * @param precision Desired decimal positions
  * @return FloatSplit_t with calculated sign, integer and decimal part
  */
-FloatSplit_t Utils_Split_Float(float value, uint8_t precision);
+FloatSplit_t Util_Split_Float(float value, uint8_t precision);
 
 #endif //UTIL_H

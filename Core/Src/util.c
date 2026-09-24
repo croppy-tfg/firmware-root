@@ -8,7 +8,7 @@
 #include "util.h"
 #include <math.h>
 
-FloatSplit_t Utils_Split_Float(float value, uint8_t precision)
+FloatSplit_t Util_Split_Float(float value, uint8_t precision)
 {
     FloatSplit_t result;
     result.is_negative = (value < 0.0f);
@@ -28,5 +28,7 @@ FloatSplit_t Utils_Split_Float(float value, uint8_t precision)
 
     return result;
 }
+
+
 
 
